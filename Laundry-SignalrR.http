@@ -1,6 +1,6 @@
-@Laundry_SignalrR_HostAddress = http://localhost:5263
+@LaundrySignalR_HostAddress = http://localhost:5263
 
-GET {{Laundry_SignalrR_HostAddress}}/hub/
+GET {{LLaundrySignalR_HostAddress}}/hub/
 Accept: application/json
 
 ###

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace Laundry_SignalrR.Hubs;
+namespace LaundrySignalR.Hubs;
 
 public class ChatHub : Hub
 {
