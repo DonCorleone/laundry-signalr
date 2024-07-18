@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laundry-SignalrR", "Laundry-SignalrR.csproj", "{0367C0A2-2D3C-4077-BB3F-602BD9E29BEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaundrySignalR", "LaundrySignalR.csproj", "{0367C0A2-2D3C-4077-BB3F-602BD9E29BEC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AE1B2D91-315F-4FB9-9FE8-83E0195830EE}"
 	ProjectSection(SolutionItems) = preProject

@@ -9,11 +9,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="17cc1bb3-49ce-4ff7-8403-77bddf351706" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Laundry-SignalrR/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Laundry-SignalrR/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Hubs/ChatHub.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Hubs/ChatHub.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Laundry-SignalrR.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Laundry-SignalrR.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Laundry-SignalrR.http" beforeDir="false" afterPath="$PROJECT_DIR$/Laundry-SignalrR.http" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Laundry-SignalrR/.idea/indexLayout.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Laundry-SignalrR/.idea/projectSettingsUpdater.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Laundry-SignalrR/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Laundry-SignalrR/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Laundry-SignalrR.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Laundry-SignalrR.http" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Laundry-SignalrR.sln" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +40,12 @@
   }
 }]]></component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Hubs/ChatHub.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/linuswieland/Documents/scm/laundry-signalr/Laundry-SignalrR/Hubs/ChatHub.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Properties/launchSettings.json" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/appsettings.Development.json" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/appsettings.json" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b07c38757b964f83908d13771c763ad582e00/00/48bc8c5f/Hub.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -148,8 +158,17 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1721333685771</updated>
-      <workItem from="1721333686882" duration="991000" />
+      <workItem from="1721333686882" duration="1234000" />
     </task>
+    <task id="LOCAL-00001" summary="change namespace">
+      <option name="closed" value="true" />
+      <created>1721334701540</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1721334701540</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -159,5 +178,7 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="change namespace" />
+    <option name="LAST_COMMIT_MESSAGE" value="change namespace" />
   </component>
 </project>

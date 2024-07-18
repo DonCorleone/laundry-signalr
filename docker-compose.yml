@@ -1,6 +1,6 @@
 ﻿services:
-  laundry-signalrr:
-    image: laundry-signalrr
+  LaundrySignalR:
+    image: LaundrySignalR
     build:
       context: .
       dockerfile: Dockerfile
