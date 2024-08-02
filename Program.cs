@@ -24,4 +24,5 @@ app.UseCors("AllowAngularClient");
 
 app.MapHub<ChatHub>("/hub");
 
-app.Run();
+// Explicitly set the port to 5263
+app.Run("http://0.0.0.0:5263");
