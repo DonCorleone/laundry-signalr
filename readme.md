@@ -11,3 +11,5 @@ docker push doncorleone/laundrysignalr:init
 ## Registry
 
 [hub.docker.com](https://hub.docker.com/r/doncorleone/laundrysignalr/tags)
+
+## Redis
