@@ -1,7 +1,4 @@
-
-using System.Net;
 using LaundrySignalR.Hubs;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -15,39 +12,23 @@ builder.Services.AddCors(options =>
                 .AllowCredentials();
         });
 });
-builder.Services
-    .AddSignalR()
-    .AddStackExchangeRedis(
-        "redis://red-cqnqmfg8fa8c73at4hog:6379",
-        o =>
-        {
-            o.ConnectionFactory = async writer =>
-            {
-                var config = new ConfigurationOptions
-                {
-                    AbortOnConnectFail = false
-                };
-                config.EndPoints.Add(IPAddress.Loopback, 0);
-                config.SetDefaultPorts();
-                var connection = await ConnectionMultiplexer.ConnectAsync(config, writer);
-                connection.ConnectionFailed += (_, e) =>
-                {
-                    Console.WriteLine("Connection to Redis failed.");
-                };
 
-                if (!connection.IsConnected)
-                {
-                    Console.WriteLine("Did not connect to Redis.");
-                }
+// Configure SignalR to use Redis backplane
+builder.Services.AddSignalR().AddStackExchangeRedis(options =>
+{
+    options.Configuration = new StackExchange.Redis.ConfigurationOptions
+    {
+        EndPoints = { "frankfurt-redis.render.com:6379" },
+        Password = "tRMjXLTr1puE30Ru0RhMBFSWT7g8Sb5U",
+        User = "red-cqnqmfg8fa8c73at4hog",
+        Ssl = true,
+        AbortOnConnectFail = false,
+    };
+});
 
-                return connection;
-            };
-            o.Configuration.AbortOnConnectFail = false;
-        });
 var app = builder.Build();
-app.UseHttpsRedirection();
-app.UseDefaultFiles();
-app.UseStaticFiles();
+
+app.UseRouting();
 // Configure the HTTP request pipeline.
 app.UseCors("AllowAngularClient");
 
