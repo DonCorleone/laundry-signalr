@@ -1,15 +1,16 @@
+using LaundrySignalR.Models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace LaundrySignalR.Hubs;
 
 public class ChatHub(ILogger<ChatHub> logger) : Hub
 {
-    public async Task NewMessage(string username, string message)
+    public async Task NewMessage(ReservationEntry message)
     {
         try
         {
-            logger.LogInformation("New message from {Username}: {Message}", username, message);
-            await Clients.All.SendAsync("messageReceived", username, message);
+            logger.LogInformation("New message from {name}: {date}", message.Name, message.Timestamp);
+            await Clients.All.SendAsync("messageReceived", message);
         }
         catch (Exception ex)
         {
