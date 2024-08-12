@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace LaundrySignalR.Hubs;
 
-public class ChatHub(ILogger<ChatHub> logger) : Hub
+public class ReservationHub(ILogger<ReservationHub> logger) : Hub
 {
     public async Task NewMessage(ReservationEntry message)
     {
