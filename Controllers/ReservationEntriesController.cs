@@ -9,9 +9,9 @@ namespace LaundrySignalR.Controllers;
 [ApiController]
 public class ReservationEntriesController : ControllerBase
 {
-    private readonly IHubContext<ReservationHub> _hubContext;
+    private readonly IHubContext<ReservationHub, IReservationHubClients> _hubContext;
 
-    public ReservationEntriesController(IHubContext<ReservationHub> hubContext)
+    public ReservationEntriesController(IHubContext<ReservationHub, IReservationHubClients> hubContext)
     {
         _hubContext = hubContext;
     }
@@ -19,12 +19,10 @@ public class ReservationEntriesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] ReservationEntry reservationEntry)
     {
-        if (reservationEntry == null) return BadRequest();
-
         // Here you can add code to save the reservationEntry to a database if needed
 
         // Notify clients via SignalR
-        await _hubContext.Clients.All.SendAsync("newMessage", reservationEntry);
+        await _hubContext.Clients.All.ReservationAdded(reservationEntry);
 
         return Ok(reservationEntry);
     }

@@ -13,13 +13,14 @@ builder.Services.AddCors(options =>
         });
 });
 builder.Services.AddControllers();
-// Configure SignalR to use Redis backplane
-var redisPw = Environment.GetEnvironmentVariable("REDIS_CONNECTION_PWD");
+// Access the configuration
+var configuration = builder.Configuration;
+var redisPw = configuration["REDIS_CONNECTION_PWD"];
 Console.WriteLine(string.IsNullOrEmpty(redisPw)
     ? "Environment variable not found."
     : $"Environment variable value: {redisPw}");
 
-var redisUser = Environment.GetEnvironmentVariable("REDIS_CONNECTION_USER");
+var redisUser =  configuration["REDIS_CONNECTION_USER"];
 Console.WriteLine(string.IsNullOrEmpty(redisUser)
     ? "Environment variable not found."
     : $"Environment variable value: {redisUser}");
