@@ -22,7 +22,7 @@ public class ReservationEntriesController(IHubContext<ReservationHub, IReservati
     }
     
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromQuery] int reservationId)
+    public async Task<IActionResult> Delete([FromQuery] long reservationId)
     {
         // Here you can add code to save the reservationEntry to a database if needed
 
