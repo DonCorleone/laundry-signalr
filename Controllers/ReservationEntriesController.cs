@@ -16,10 +16,9 @@ public class ReservationEntriesController : ControllerBase
 // constructor
     public ReservationEntriesController(
         IHubContext<ReservationHub, IReservationHubClients> hubContext,
-        IConfiguration configuration, IRedisService redisService)
+        IConfiguration configuration)
     {
         _hubContext = hubContext;
-        _redisService = redisService;
         
         // Access the configuration
 
