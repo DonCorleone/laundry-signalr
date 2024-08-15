@@ -11,58 +11,35 @@ namespace LaundrySignalR.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ReservationEntriesController : ControllerBase
+public class ReservationEntriesController(
+    IHubContext<ReservationHub, IReservationHubClients> hubContext,
+    IRedisService redisService)
+    : ControllerBase
 {
 // constructor
-    public ReservationEntriesController(
-        IHubContext<ReservationHub, IReservationHubClients> hubContext,
-        IConfiguration configuration)
+
+    private readonly IDatabase _db = redisService.GetDatabase();
+
+    [HttpPost]
+    public async Task<IActionResult> Post([FromBody] ReservationEntry reservationEntry)
     {
-        _hubContext = hubContext;
-        
-        // Access the configuration
+        // Here you can add code to save the reservationEntry to a database if needed
+        Add(reservationEntry);
+        // Notify clients via SignalR
+        await hubContext.Clients.All.ReservationAdded(reservationEntry);
 
-        var redisPw = configuration["REDIS_CONNECTION_PWD"];
-        Console.WriteLine(string.IsNullOrEmpty(redisPw)
-            ? "Environment variable not found."
-            : $"Environment variable value: {redisPw}");
+        return Ok(reservationEntry);
+    }
 
-        var redisUser = configuration["REDIS_CONNECTION_USER"];
-        Console.WriteLine(string.IsNullOrEmpty(redisUser)
-            ? "Environment variable not found."
-            : $"Environment variable value: {redisUser}");
-
-        var options = new StackExchange.Redis.ConfigurationOptions
-        {
-            EndPoints = { "frankfurt-redis.render.com:6379" },
-            // use the password from render.com environment variables
-            Password = redisPw,
-            User = redisUser,
-            Ssl = true,
-            AbortOnConnectFail = false,
-        };
-        ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(options);
-        IDatabase db = redis.GetDatabase();
-
-        /*db.StringSet("foo", "bar");
-        // Read all keys
-        var server = redis.GetServer("frankfurt-redis.render.com:6379");
-        var keys = server.Keys();
-
-        // Read all values
-        foreach (var key in keys)
-        {
-            var value = db.StringGet(key);
-            Console.WriteLine($"Key: {key}, Value: {value}");
-        }*/
-        
-        bool res1 = db.SortedSetAdd("racer_scores", "Norem", 10);
+    private void Add(ReservationEntry reservationEntry)
+    {
+        bool res1 = _db.SortedSetAdd("racer_scores", "Norem", 10);
         Console.WriteLine(res1); // >>> True
 
-        bool res2 = db.SortedSetAdd("racer_scores", "Castilla", 12);
+        bool res2 = _db.SortedSetAdd("racer_scores", "Castilla", 12);
         Console.WriteLine(res2); // >>> True
 
-        long res3 = db.SortedSetAdd("racer_scores", new[]{
+        long res3 = _db.SortedSetAdd("racer_scores", new[]{
             new SortedSetEntry("Sam-Bodden", 8),
             new SortedSetEntry("Royce", 10),
             new SortedSetEntry("Ford", 6),
@@ -71,28 +48,12 @@ public class ReservationEntriesController : ControllerBase
         });
         Console.WriteLine(res3); // >>> 4
         
-        RedisValue[] res4 = db.SortedSetRangeByRank("racer_scores", 0, -1);
+        RedisValue[] res4 = _db.SortedSetRangeByRank("racer_scores", 0, -1);
         Console.WriteLine(string.Join(", ", res4)); // >>> Ford, Sam-Bodden, Norem, Royce, Castilla, Prickett
 
-        RedisValue[] res5 = db.SortedSetRangeByRank("racer_scores", 0, -1, Order.Descending);
+        RedisValue[] res5 = _db.SortedSetRangeByRank("racer_scores", 0, -1, Order.Descending);
         Console.WriteLine(string.Join(", ", res5)); // >>> Prickett, Castilla, Royce, Norem, Sam-Bodden, Ford
 
-
-    }
-
-    private readonly List<ReservationEntry> _reservationEntries = [];
-    private readonly IHubContext<ReservationHub, IReservationHubClients> _hubContext;
-    private readonly IRedisService _redisService;
-
-    [HttpPost]
-    public async Task<IActionResult> Post([FromBody] ReservationEntry reservationEntry)
-    {
-        // Here you can add code to save the reservationEntry to a database if needed
-        _reservationEntries.Add(reservationEntry);
-        // Notify clients via SignalR
-        await _hubContext.Clients.All.ReservationAdded(reservationEntry);
-
-        return Ok(reservationEntry);
     }
 
     [HttpDelete]
@@ -100,17 +61,17 @@ public class ReservationEntriesController : ControllerBase
     {
         // Here you can add code to save the reservationEntry to a database if needed
         // Find the reservationEntry by Id
-        var reservationEntry = _reservationEntries.FirstOrDefault(p => p.Id == reservationId);
+        /*var reservationEntry = _reservationEntries.FirstOrDefault(p => p.Id == reservationId);
         if (reservationEntry == null)
         {
             return NotFound();
-        }
+        }*/
 
         // and remove it
-        _reservationEntries.Remove(reservationEntry);
+     //   _reservationEntries.Remove(reservationEntry);
 
         // Notify clients via SignalR
-        await _hubContext.Clients.All.ReservationDeleted(reservationId);
+        await hubContext.Clients.All.ReservationDeleted(reservationId);
 
         return Ok(reservationId);
     }

@@ -1,4 +1,6 @@
 using LaundrySignalR.Hubs;
+using LaundrySignalR.Services;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -13,32 +15,25 @@ builder.Services.AddCors(options =>
         });
 });
 builder.Services.AddControllers();
-// Access the configuration
-var configuration = builder.Configuration;
-var redisPw = configuration["REDIS_CONNECTION_PWD"];
-Console.WriteLine(string.IsNullOrEmpty(redisPw)
-    ? "Environment variable not found."
-    : $"Environment variable value: {redisPw}");
 
-var redisUser =  configuration["REDIS_CONNECTION_USER"];
-Console.WriteLine(string.IsNullOrEmpty(redisUser)
-    ? "Environment variable not found."
-    : $"Environment variable value: {redisUser}");
+var configuration = builder.Configuration;
+var redisOptions = new ConfigurationOptions
+{
+    EndPoints = { "frankfurt-redis.render.com:6379" },
+    Password = configuration["REDIS_CONNECTION_PWD"],
+    User = configuration["REDIS_CONNECTION_USER"],
+    Ssl = true,
+    AbortOnConnectFail = false,
+};
+
+builder.Services.AddSingleton<IRedisService>(new RedisService(redisOptions));
+
 builder.Services.AddSignalR().AddStackExchangeRedis(options =>
 {
-    options.Configuration = new StackExchange.Redis.ConfigurationOptions
-    {
-        EndPoints = { "frankfurt-redis.render.com:6379" },
-        // use the password from render.com environment variables
-        Password = redisPw,
-        User = redisUser,
-        Ssl = true,
-        AbortOnConnectFail = false,
-    };
+    options.Configuration = redisOptions;
 });
 
 var app = builder.Build();
-
 app.UseRouting();
 // Configure the HTTP request pipeline.
 app.UseCors("AllowAngularClient");
