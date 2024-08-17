@@ -45,22 +45,29 @@ public class ReservationEntriesController(
     }
 
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromQuery] long reservationId)
+    public async Task<IActionResult> Delete([FromBody] ReservationEntry reservationEntry)
     {
-        // Here you can add code to save the reservationEntry to a database if needed
-        // Find the reservationEntry by Id
-        /*var reservationEntry = _reservationEntries.FirstOrDefault(p => p.Id == reservationId);
-        if (reservationEntry == null)
+        // Here you can add code to delete the reservationEntry from a database if needed
+        bool removed = Remove(reservationEntry);
+        if (!removed)
         {
-            return NotFound();
-        }*/
-
+            return BadRequest();
+        }
         // and remove it
      //   _reservationEntries.Remove(reservationEntry);
-
+        var reservationId = reservationEntry.Id;
         // Notify clients via SignalR
         await hubContext.Clients.All.ReservationDeleted(reservationId);
 
         return Ok(reservationId);
+    }
+    
+    private bool Remove(ReservationEntry reservationEntry)
+    {
+        var key = reservationEntry.Tags[0];
+        var value = reservationEntry.Name;
+        bool res = _db.SortedSetRemove(key, value);
+        Console.WriteLine(res); 
+        return res;
     }
 }
