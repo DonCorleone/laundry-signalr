@@ -23,15 +23,14 @@ public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisS
         var db = redisService.GetDatabase();
             
         // load all reservations from the database
-        var sortedSetEntries = db.SortedSetRangeByRankWithScores("Machine 1", 0, -1);
+        var hashEntries = db.HashGetAll(machineId);
         
         // map the reservations to ReservationEntry objects
-        var reservationEntries = sortedSetEntries.Select(entry => new ReservationEntry
+        var reservationEntries = hashEntries.Select(entry => new ReservationEntry
         {
-            Id = (long)entry.Score,
-            Name = entry.Element,
-            Timestamp = DateTime.Now,
-            Tags = [machineId]
+            Id = (long)entry.Name,
+            Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
+            Device = machineId
         });
         await Clients.Caller.ReservationsLoaded(reservationEntries);
         await base.OnConnectedAsync();

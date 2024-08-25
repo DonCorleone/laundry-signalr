@@ -39,7 +39,15 @@ public class ReservationEntriesController(
 
     private bool Add(ReservationEntry reservationEntry)
     {
-        bool res = _db.SortedSetAdd(reservationEntry.Tags[0], reservationEntry.Name, reservationEntry.Id);
+        // Set a Redis Hashset entry where
+        // <param name="key"> is the reservationEntry.Tags[0]</param>
+        // <param name="hashField">is the reservations.id</param>
+        // <param name="value">is the reservations.name</param>
+        var key = reservationEntry.Device;
+        var hashField = reservationEntry.Id.ToString();
+        var value = reservationEntry.Name;
+        
+        bool res = _db.HashSetAsync(key, hashField, value).Result;
         Console.WriteLine(res); 
         return res;
     }
@@ -64,9 +72,9 @@ public class ReservationEntriesController(
     
     private bool Remove(ReservationEntry reservationEntry)
     {
-        var key = reservationEntry.Tags[0];
-        var value = reservationEntry.Name;
-        bool res = _db.SortedSetRemove(key, value);
+        var key = reservationEntry.Device;
+        var value = reservationEntry.Id;
+        bool res = _db.HashDelete(key, value);
         Console.WriteLine(res); 
         return res;
     }
