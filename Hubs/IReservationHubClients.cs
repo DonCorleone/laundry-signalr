@@ -6,5 +6,6 @@ public interface IReservationHubClients
 { 
     Task ReservationsLoaded(IEnumerable<ReservationEntry> reservationEntries);
     Task ReservationAdded(ReservationEntry reservationEntry);
-    Task ReservationDeleted(long reservationEntry);
+    Task ReservationDeleted(string reservationEntry);
+    Task ReservationUpdated(ReservationEntry reservationEntry);
 }

@@ -28,9 +28,9 @@ public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisS
         // map the reservations to ReservationEntry objects
         var reservationEntries = hashEntries.Select(entry => new ReservationEntry
         {
-            Id = (long)entry.Name,
+            Id = entry.Name,
             Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
-            Device = machineId
+            DeviceId = machineId
         });
         await Clients.Caller.ReservationsLoaded(reservationEntries);
         await base.OnConnectedAsync();

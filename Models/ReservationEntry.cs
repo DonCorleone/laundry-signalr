@@ -1,8 +1,11 @@
+using System.Runtime.InteropServices.JavaScript;
+
 namespace LaundrySignalR.Models;
 
 public class ReservationEntry
 {
-    public long Id { get; set; }
+    public string Id { get; set; }
     public string Name { get; set; }
-    public string Device { get; set; }
+    public string DeviceId { get; set; }
+    public string Date { get; set; }
 }

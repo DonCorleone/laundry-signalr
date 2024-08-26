@@ -24,45 +24,48 @@ public class ReservationEntriesController(
     public async Task<IActionResult> Post([FromBody] ReservationEntry reservationEntry)
     {
         // Here you can add code to save the reservationEntry to a database if needed
-        bool added = Add(reservationEntry);
+        try
+        {
+            var added = await Add(reservationEntry);
         
-        if (!added)
+            // Notify clients via SignalR
+            if (added)
+            {
+                await hubContext.Clients.All.ReservationAdded(reservationEntry);
+            }else
+            {
+                await hubContext.Clients.All.ReservationUpdated(reservationEntry);
+            }
+            
+            return Ok(reservationEntry);
+        }
+        catch (Exception e)
         {
             return BadRequest();
         }
-        
-        // Notify clients via SignalR
-        await hubContext.Clients.All.ReservationAdded(reservationEntry);
-
-        return Ok(reservationEntry);
     }
 
-    private bool Add(ReservationEntry reservationEntry)
+    private Task<bool> Add(ReservationEntry reservationEntry)
     {
-        // Set a Redis Hashset entry where
-        // <param name="key"> is the reservationEntry.Tags[0]</param>
-        // <param name="hashField">is the reservations.id</param>
-        // <param name="value">is the reservations.name</param>
-        var key = reservationEntry.Device;
+        var key = reservationEntry.DeviceId;
         var hashField = reservationEntry.Id.ToString();
         var value = reservationEntry.Name;
         
-        bool res = _db.HashSetAsync(key, hashField, value).Result;
+        var res = _db.HashSetAsync(key, hashField, value).Result;
         Console.WriteLine(res); 
-        return res;
+        return Task.FromResult(res);
     }
 
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] ReservationEntry reservationEntry)
     {
         // Here you can add code to delete the reservationEntry from a database if needed
-        bool removed = Remove(reservationEntry);
+        var removed = await Remove(reservationEntry);
         if (!removed)
         {
             return BadRequest();
         }
-        // and remove it
-     //   _reservationEntries.Remove(reservationEntry);
+
         var reservationId = reservationEntry.Id;
         // Notify clients via SignalR
         await hubContext.Clients.All.ReservationDeleted(reservationId);
@@ -70,11 +73,11 @@ public class ReservationEntriesController(
         return Ok(reservationId);
     }
     
-    private bool Remove(ReservationEntry reservationEntry)
+    private Task<bool> Remove(ReservationEntry reservationEntry)
     {
-        var key = reservationEntry.Device;
+        var key = reservationEntry.DeviceId;
         var value = reservationEntry.Id;
-        bool res = _db.HashDelete(key, value);
+        var res = _db.HashDeleteAsync(key, value);
         Console.WriteLine(res); 
         return res;
     }
