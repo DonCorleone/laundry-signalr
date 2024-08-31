@@ -9,29 +9,38 @@ public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisS
     public override async Task OnConnectedAsync()
     {
         logger.LogInformation("Client connected: {0}", Context.ConnectionId);
-        
-        // Read machineId from query string
-        var machineId = Context.GetHttpContext()?.Request.Query["machineId"].ToString();
 
-        if (string.IsNullOrEmpty(machineId))
+        // Read machineIds from query string
+        var query = Context.GetHttpContext()?.Request.Query;
+        var machineIds = query?.Where(q => q.Key.StartsWith("machineid"))
+            .Select(q => q.Value.ToString())
+            .ToArray();
+
+        if (machineIds == null || machineIds.Length == 0)
         {
-            logger.LogWarning("Machine ID is missing in the query string.");
+            logger.LogWarning("Machine IDs are missing in the query string.");
             await base.OnConnectedAsync();
             return;
         }
-        // send all reservations to the client
+
         var db = redisService.GetDatabase();
-            
-        // load all reservations from the database
-        var hashEntries = db.HashGetAll(machineId);
-        
-        // map the reservations to ReservationEntry objects
-        var reservationEntries = hashEntries.Select(entry => new ReservationEntry
-        {
-            Id = entry.Name,
-            Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
-            DeviceId = machineId
-        });
+        var reservationEntries = new List<ReservationEntry>();
+
+        foreach (var machineId in machineIds) {
+            // load all reservations from the database
+            var hashEntries = db.HashGetAll(machineId);
+
+            // map the reservations to ReservationEntry objects
+            var entries = hashEntries.Select(entry => new ReservationEntry
+            {
+                Id = entry.Name,
+                Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
+                DeviceId = machineId
+            });
+
+            reservationEntries.AddRange(entries);
+        }
+
         await Clients.Caller.ReservationsLoaded(reservationEntries);
         await base.OnConnectedAsync();
     }

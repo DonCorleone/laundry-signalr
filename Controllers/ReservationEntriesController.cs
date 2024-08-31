@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.JavaScript;
 using LaundrySignalR.Hubs;
 using LaundrySignalR.Models;
 using LaundrySignalR.Services;
@@ -16,10 +17,41 @@ public class ReservationEntriesController(
     IRedisService redisService)
     : ControllerBase
 {
-// constructor
 
     private readonly IDatabase _db = redisService.GetDatabase();
 
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        var query = HttpContext.Request.Query;
+        var machineIds = query.Where(q => q.Key.StartsWith("machineid"))
+            .Select(q => q.Value.ToString())
+            .ToArray();
+
+        if (machineIds.Length == 0)
+        {
+            return BadRequest("Machine IDs are missing in the query string.");
+        }
+
+        var reservationEntries = new List<ReservationEntry>();
+
+        foreach (var machineId in machineIds)
+        {
+            var hashEntries = await _db.HashGetAllAsync(machineId);
+            var entries = hashEntries.Select(entry => new ReservationEntry
+            {
+                Id = entry.Name,
+                Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
+                DeviceId = machineId,
+                Date = entry.Name.ToString().Substring(0,24)
+            });
+
+            reservationEntries.AddRange(entries);
+        }
+
+        return Ok(reservationEntries);
+    }
+    
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] ReservationEntry reservationEntry)
     {
