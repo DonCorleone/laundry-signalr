@@ -102,7 +102,7 @@ public class ReservationEntriesController(
         // Notify clients via SignalR
         await hubContext.Clients.All.ReservationDeleted(reservationId);
 
-        return Ok(reservationId);
+        return Ok(new {reservationId});
     }
     
     private Task<bool> Remove(ReservationEntry reservationEntry)
