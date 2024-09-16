@@ -80,7 +80,7 @@ public class ReservationEntriesController(
     private Task<bool> Add(ReservationEntry reservationEntry)
     {
         var key = reservationEntry.DeviceId;
-        var hashField = reservationEntry.Id.ToString();
+        var hashField = reservationEntry.Id;
         var value = reservationEntry.Name;
         
         var res = _db.HashSetAsync(key, hashField, value).Result;
