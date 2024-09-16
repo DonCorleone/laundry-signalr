@@ -2,6 +2,7 @@ using LaundrySignalR.Hubs;
 using LaundrySignalR.Services;
 using StackExchange.Redis;
 
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
@@ -14,6 +15,7 @@ builder.Services.AddCors(options =>
                 .AllowCredentials();
         });
 });
+
 builder.Services.AddControllers();
 
 var configuration = builder.Configuration;
@@ -32,6 +34,7 @@ builder.Services.AddSignalR().AddStackExchangeRedis(options =>
 {
     options.Configuration = redisOptions;
 });
+
 
 var app = builder.Build();
 app.UseRouting();
