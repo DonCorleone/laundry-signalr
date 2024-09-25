@@ -13,3 +13,36 @@ docker push doncorleone/laundrysignalr:init
 [hub.docker.com](https://hub.docker.com/r/doncorleone/laundrysignalr/tags)
 
 ## Redis
+
+## User Secrets
+    
+```xml
+<PropertyGroup>
+    <UserSecretsId>your-guid-here</UserSecretsId>
+</PropertyGroup>
+```
+
+```bash
+dotnet user-secrets init
+```
+
+```bash
+dotnet user-secrets list
+```
+
+```bash
+dotnet user-secrets set "MY_ENV_VAR" "YourSecretValue"
+```
+
+```csharp
+string secretValue = Environment.GetEnvironmentVariable("MY_ENV_VAR");
+
+if (string.IsNullOrEmpty(secretValue))
+{
+    Console.WriteLine("Environment variable not found.");
+}
+else
+{
+    Console.WriteLine($"Environment variable value: {secretValue}");
+}
+```
