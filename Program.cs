@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-
+builder.Services.AddSingleton<IJsonFileService, JsonFileService>();
 var configuration = builder.Configuration;
 var redisOptions = new ConfigurationOptions
 {

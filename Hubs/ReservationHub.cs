@@ -4,12 +4,20 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace LaundrySignalR.Hubs;
 
-public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisService) : Hub<IReservationHubClients>
+public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisService, IJsonFileService jsonFileService) : Hub<IReservationHubClients>
 {
     public override async Task OnConnectedAsync()
     {
         logger.LogInformation("Client connected: {0}", Context.ConnectionId);
 
+        var subjects = await jsonFileService.LoadSubjects();
+        if (subjects?.Count == 0)
+        {
+            Console.WriteLine("No Subjects found.");
+        }
+        subjects?.ForEach((x) => Console.WriteLine(x.Name));
+
+        
         // Read machineIds from query string
         var query = Context.GetHttpContext()?.Request.Query;
         var machineIds = query?.Where(q => q.Key.StartsWith("machineid"))
