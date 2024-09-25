@@ -1,6 +1,13 @@
 ﻿services:
   LaundrySignalR:
-    image: LaundrySignalR
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - PLATFORM=linux/amd64 -t
+    image: doncorleone/laundrysignalr:init
+    volumes:
+      - mydata:/var/data
+      
+volumes:
+  mydata:
