@@ -16,5 +16,11 @@
     "Name": "Washing Machine 2",
     "Icon": "local_laundry_service",
     "Avatar": "M-2"
+  },
+  {
+    "Key": "1234d",
+    "Name": "Dryer 2",
+    "Icon": "heat",
+    "Avatar": "D-2"
   }
 ]
