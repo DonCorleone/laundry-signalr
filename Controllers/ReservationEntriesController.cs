@@ -33,12 +33,12 @@ public class ReservationEntriesController(
 
         foreach (var subject in subjects)
         {
-            var hashEntries = await _db.HashGetAllAsync(subject.Avatar);
+            var hashEntries = await _db.HashGetAllAsync(subject.Key);
             var entries = hashEntries.Select(entry => new ReservationEntry
             {
                 Id = entry.Name,
                 Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
-                DeviceId = subject.Avatar,
+                DeviceId = subject.Key,
                 Date = entry.Name.ToString().Substring(0,24)
             });
 

@@ -24,14 +24,14 @@ public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisS
 
         foreach (var subject in subjects) {
             // load all reservations from the database
-            var hashEntries = db.HashGetAll(subject.Avatar);
+            var hashEntries = db.HashGetAll(subject.Key);
 
             // map the reservations to ReservationEntry objects
             var entries = hashEntries.Select(entry => new ReservationEntry
             {
                 Id = entry.Name,
                 Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
-                DeviceId = subject.Avatar
+                DeviceId = subject.Key
             });
 
             reservationEntries.AddRange(entries);
