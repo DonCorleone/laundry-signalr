@@ -1,0 +1,22 @@
+[
+  {
+    "Name": "Washing Machine 1",
+    "Icon": "Washing Machine",
+    "Avatar": "M-1"
+  },
+  {
+    "Name": "Dryer 1",
+    "Icon": "Dryer",
+    "Avatar": "M-2"
+  },
+  {
+    "Name": "Washing Machine 2",
+    "Icon": "Washing Machine",
+    "Avatar": "M-3"
+  },
+  {
+    "Name": "Dryer 2",
+    "Icon": "Dryer",
+    "Avatar": "M-4"
+  }
+]

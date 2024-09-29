@@ -1,22 +1,26 @@
 [
   {
+    "Key": "1234a",
     "Name": "Washing Machine 1",
-    "Icon": "Washing Machine",
-    "Avatar": "WM1"
+    "Icon": "local_laundry_service",
+    "Avatar": "M-1"
   },
   {
+    "Key": "1234b",
     "Name": "Dryer 1",
-    "Icon": "Dryer",
-    "Avatar": "DR1"
+    "Icon": "heat",
+    "Avatar": "D-1"
   },
   {
+    "Key": "1234c",
     "Name": "Washing Machine 2",
-    "Icon": "Washing Machine",
-    "Avatar": "WM2"
+    "Icon": "local_laundry_service",
+    "Avatar": "M-2"
   },
   {
+    "Key": "1234d",
     "Name": "Dryer 2",
-    "Icon": "Dryer",
-    "Avatar": "DR2"
+    "Icon": "heat",
+    "Avatar": "D-2"
   }
 ]
