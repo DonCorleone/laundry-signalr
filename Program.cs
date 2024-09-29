@@ -9,7 +9,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngularClient",
         b =>
         {
-            b.WithOrigins(["http://localhost:4200", "https://laundry-calendar.netlify.app"])
+            b.WithOrigins([
+                    "http://localhost:4200", 
+                    "https://laundry-calendar.netlify.app", 
+                    "https://server-mock--laundry-calendar.netlify.app/"
+                ])
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();

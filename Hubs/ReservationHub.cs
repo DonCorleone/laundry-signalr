@@ -14,7 +14,7 @@ public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisS
 
         if (subjects == null || subjects.Count == 0)
         {
-            logger.LogWarning("Machine IDs are missing in the query string.");
+            logger.LogWarning("Subjects are missing.");
             await base.OnConnectedAsync();
             return;
         }
