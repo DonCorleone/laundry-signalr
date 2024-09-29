@@ -2,21 +2,6 @@
   {
     "Name": "Washing Machine 1",
     "Icon": "Washing Machine",
-    "Avatar": "WM1"
-  },
-  {
-    "Name": "Dryer 1",
-    "Icon": "Dryer",
-    "Avatar": "DR1"
-  },
-  {
-    "Name": "Washing Machine 2",
-    "Icon": "Washing Machine",
-    "Avatar": "WM2"
-  },
-  {
-    "Name": "Dryer 2",
-    "Icon": "Dryer",
-    "Avatar": "DR2"
+    "Avatar": "M-1"
   }
 ]

@@ -14,7 +14,7 @@ namespace LaundrySignalR.Controllers;
 [ApiController]
 public class ReservationEntriesController(
     IHubContext<ReservationHub, IReservationHubClients> hubContext,
-    IRedisService redisService)
+    IRedisService redisService, IJsonFileService jsonFileService)
     : ControllerBase
 {
 
@@ -23,26 +23,22 @@ public class ReservationEntriesController(
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        var query = HttpContext.Request.Query;
-        var machineIds = query.Where(q => q.Key.StartsWith("machineid"))
-            .Select(q => q.Value.ToString())
-            .ToArray();
-
-        if (machineIds.Length == 0)
+        var subjects = await jsonFileService.LoadSubjects();
+        if (subjects == null || subjects.Count == 0)
         {
-            return BadRequest("Machine IDs are missing in the query string.");
+            return BadRequest("No Subjects found");
         }
 
         var reservationEntries = new List<ReservationEntry>();
 
-        foreach (var machineId in machineIds)
+        foreach (var subject in subjects)
         {
-            var hashEntries = await _db.HashGetAllAsync(machineId);
+            var hashEntries = await _db.HashGetAllAsync(subject.Avatar);
             var entries = hashEntries.Select(entry => new ReservationEntry
             {
                 Id = entry.Name,
                 Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
-                DeviceId = machineId,
+                DeviceId = subject.Avatar,
                 Date = entry.Name.ToString().Substring(0,24)
             });
 

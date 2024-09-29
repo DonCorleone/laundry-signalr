@@ -11,20 +11,8 @@ public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisS
         logger.LogInformation("Client connected: {0}", Context.ConnectionId);
 
         var subjects = await jsonFileService.LoadSubjects();
-        if (subjects?.Count == 0)
-        {
-            Console.WriteLine("No Subjects found.");
-        }
-        subjects?.ForEach((x) => Console.WriteLine(x.Name));
 
-        
-        // Read machineIds from query string
-        var query = Context.GetHttpContext()?.Request.Query;
-        var machineIds = query?.Where(q => q.Key.StartsWith("machineid"))
-            .Select(q => q.Value.ToString())
-            .ToArray();
-
-        if (machineIds == null || machineIds.Length == 0)
+        if (subjects == null || subjects.Count == 0)
         {
             logger.LogWarning("Machine IDs are missing in the query string.");
             await base.OnConnectedAsync();
@@ -34,16 +22,16 @@ public class ReservationHub(ILogger<ReservationHub> logger, IRedisService redisS
         var db = redisService.GetDatabase();
         var reservationEntries = new List<ReservationEntry>();
 
-        foreach (var machineId in machineIds) {
+        foreach (var subject in subjects) {
             // load all reservations from the database
-            var hashEntries = db.HashGetAll(machineId);
+            var hashEntries = db.HashGetAll(subject.Avatar);
 
             // map the reservations to ReservationEntry objects
             var entries = hashEntries.Select(entry => new ReservationEntry
             {
                 Id = entry.Name,
                 Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
-                DeviceId = machineId
+                DeviceId = subject.Avatar
             });
 
             reservationEntries.AddRange(entries);

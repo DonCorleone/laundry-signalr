@@ -5,15 +5,22 @@ namespace LaundrySignalR.Services;
 
 public class JsonFileService() : IJsonFileService
 {
+    private List<Subject>? _subjects;
     public async Task<List<Subject>?> LoadSubjects()
     {
-        if (!File.Exists("data/subjects.json"))
+        if (_subjects == null)
         {
-            Console.WriteLine("File not found.");
-            return [];
+            if (!File.Exists("data/subjects.json"))
+            {
+                Console.WriteLine("File not found.");
+                return [];
+            }
+
+            var json = await File.ReadAllTextAsync("data/subjects.json");
+            _subjects = JsonSerializer.Deserialize<List<Subject>>(json);
+            return _subjects;
         }
 
-        var json = await File.ReadAllTextAsync("data/subjects.json");
-        return JsonSerializer.Deserialize<List<Subject>>(json);
+        return _subjects;
     }
 }
