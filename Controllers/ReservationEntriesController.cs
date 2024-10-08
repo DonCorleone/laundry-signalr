@@ -59,11 +59,11 @@ public class ReservationEntriesController(
             // Notify clients via SignalR
             if (added)
             {
-                await hubContext.Clients.AllExcept(new List<string>(){reservationEntry.ConnectionId})
+                await hubContext.Clients.All
                     .ReservationAdded(reservationEntry);
             }else
             {
-                await hubContext.Clients.AllExcept(new List<string>(){reservationEntry.ConnectionId})
+                await hubContext.Clients.All
                     .ReservationUpdated(reservationEntry);
             }
             
