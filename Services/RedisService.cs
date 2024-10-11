@@ -3,11 +3,13 @@
 using LaundrySignalR.Models;
 using StackExchange.Redis;
 using Microsoft.Extensions.Configuration;
+
 namespace LaundrySignalR.Services;
 
 public class RedisService : IRedisService
 {
     private readonly IDatabase _db;
+    private readonly TimeSpan _defaultExpiration = TimeSpan.FromHours(1); // Set your default expiration time here
 
     public RedisService(ConfigurationOptions options)
     {
@@ -16,10 +18,11 @@ public class RedisService : IRedisService
     }
 
     public IDatabase GetDatabase() => _db;
-    
+
     public async Task<List<ReservationEntry>> GetAllEntries(List<Subject> subjects)
     {
         var reservationEntries = new List<ReservationEntry>();
+
         foreach (var subject in subjects)
         {
             var hashEntries = await _db.HashGetAllAsync(subject.Key);
@@ -28,7 +31,7 @@ public class RedisService : IRedisService
                 Id = entry.Name,
                 Name = entry.Value.HasValue ? entry.Value.ToString() : string.Empty,
                 DeviceId = subject.Key,
-                Date = entry.Name.ToString().Substring(0,24)
+                Date = entry.Name.ToString().Substring(0, 24)
             });
 
             reservationEntries.AddRange(entries);
@@ -36,24 +39,28 @@ public class RedisService : IRedisService
 
         return reservationEntries;
     }
-    public Task<bool> Add(ReservationEntry reservationEntry)
+
+    public async Task<bool> Add(ReservationEntry reservationEntry)
     {
         var key = reservationEntry.DeviceId;
         var hashField = reservationEntry.Id;
         var value = reservationEntry.Name;
-        
-        var res = _db.HashSetAsync(key, hashField, value).Result;
-        
-        Console.WriteLine(res); 
-        return Task.FromResult(res);
+        var expirationTime = DateTimeOffset.UtcNow.Add(_defaultExpiration).ToUnixTimeSeconds();
+
+        var hashSetResult = await _db.HashSetAsync(key, hashField, value);
+        var sortedSetResult = await _db.SortedSetAddAsync("reservations_expirations", hashField, expirationTime);
+
+        return hashSetResult && sortedSetResult;
     }
-    
-    public Task<bool> Remove(ReservationEntry reservationEntry)
+
+    public async Task<bool> Remove(ReservationEntry reservationEntry)
     {
         var key = reservationEntry.DeviceId;
         var value = reservationEntry.Id;
-        var res = _db.HashDeleteAsync(key, value);
-        Console.WriteLine(res); 
-        return res;
+
+        var hashDeleteResult = await _db.HashDeleteAsync(key, value);
+        var sortedSetRemoveResult = await _db.SortedSetRemoveAsync("reservations_expirations", value);
+
+        return hashDeleteResult && sortedSetRemoveResult;
     }
 }
