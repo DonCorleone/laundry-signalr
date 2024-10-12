@@ -45,12 +45,20 @@ public class RedisService : IRedisService
         var key = reservationEntry.DeviceId;
         var hashField = reservationEntry.Id;
         var value = reservationEntry.Name;
-        var expirationTime = DateTimeOffset.UtcNow.Add(_defaultExpiration).ToUnixTimeSeconds();
+
+        // Parse the Date property to get the expiration time in milliseconds
+        if (!DateTimeOffset.TryParse(reservationEntry.Date, out var dateTimeOffset))
+        {
+            throw new ArgumentException("Invalid date format in reservation entry.");
+        }
+        var expirationTime = dateTimeOffset.ToUnixTimeMilliseconds();
 
         var hashSetResult = await _db.HashSetAsync(key, hashField, value);
-        var sortedSetResult = await _db.SortedSetAddAsync("reservations_expirations", hashField, expirationTime);
 
-        return hashSetResult && sortedSetResult;
+        // Fire and forget SortedSetAddAsync
+        Task.Run(() => _db.SortedSetAddAsync("reservations_expirations", hashField, expirationTime));
+
+        return hashSetResult;
     }
 
     public async Task<bool> Remove(ReservationEntry reservationEntry)
