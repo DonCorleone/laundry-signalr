@@ -1,30 +1,23 @@
 [
   {
-    "Key": "1234a",
-    "Name": "Washing Machine 1",
+    "Key": "WM1",
+    "Name": "Miele Powerwash",
     "Icon": "local_laundry_service",
-    "Avatar": "M-1",
-    "Image": "https://www.vzug.com/medias/sys_master/products/products/h11/h3a/10892768477214/1104200000-external-big.jpg"
+    "Avatar": "WM New",
+    "Image": "https://laundry-calendar.netlify.app/assets/img/Miele-Powerwash.jpg"
   },
   {
-    "Key": "1234b",
-    "Name": "Dryer 1",
+    "Key": "DR1",
+    "Name": "VZug Unimatic TL WP",
     "Icon": "heat",
-    "Avatar": "D-1",
-    "Image": "https://static-eu-data.manualslib.com/product-images/b8c/447164/v-zug-adora-tl-wp-w%C3%A4schetrockner.jpg"
+    "Avatar": "Dryer",
+    "Image": "https://laundry-calendar.netlify.app/assets/img/VZug-Unimatic-TL-WP.jpg"
   },
   {
-    "Key": "1234c",
-    "Name": "Washing Machine 2",
+    "Key": "WM2",
+    "Name": "VZug Unimatic",
     "Icon": "local_laundry_service",
-    "Avatar": "M-2",
-    "Image": "https://www.vzug.com/medias/sys_master/products/products/h85/h58/10892690227230/1102010024-external-big.jpg"
-  },
-  {
-    "Key": "1234d",
-    "Name": "Dryer 2",
-    "Icon": "heat",
-    "Avatar": "D-2",
-    "Image": "https://www.vzug.com/medias/sys_master/products/products/h8d/h62/10790990610462/1200810004-square960.jpg"
+    "Avatar": "WM Old",
+    "Image": "https://laundry-calendar.netlify.app/assets/img/VZug-Unimatic.jpg"
   }
 ]
