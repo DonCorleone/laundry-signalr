@@ -10,8 +10,8 @@ builder.Services.AddCors(options =>
         b =>
         {
             b.WithOrigins([
-                    "http://localhost:4200", 
                     "https://laundry-calendar.netlify.app", 
+                    "https://laundry-reservation.onrender.com",
                     "https://server-mock--laundry-calendar.netlify.app/"
                 ])
                 .AllowAnyHeader()

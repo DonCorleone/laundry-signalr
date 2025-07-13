@@ -14,6 +14,12 @@ docker push doncorleone/laundrysignalr:init
 
 ## Redis
 
+brew tap ringohub/redis-cli
+
+brew update && brew doctor
+
+brew install redis-cli
+
 ## User Secrets
     
 ```xml
