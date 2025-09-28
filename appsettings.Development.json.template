@@ -5,8 +5,8 @@
       "Microsoft.AspNetCore": "Warning"
     }
   },
-  "AllowedHosts": "*",
   "MongoDB": {
-    "DatabaseName": "laundry-calendar"
+    "ConnectionString": "mongodb://localhost:27017",
+    "DatabaseName": "laundry-calendar-dev"
   }
 }
