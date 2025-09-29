@@ -111,6 +111,123 @@ public class ReservationHub : Hub<IReservationHubClients>
         return defaultTenant?.Id;
     }
 
+    // Hub method to create a new reservation
+    public async Task CreateReservation(CreateReservationRequest request)
+    {
+        try
+        {
+            _logger.LogInformation("CreateReservation called by {ConnectionId} with data: {@Request}", Context.ConnectionId, request);
+            
+            var tenantId = GetTenantIdFromQuery();
+            if (string.IsNullOrEmpty(tenantId))
+            {
+                _logger.LogWarning("CreateReservation called without tenant context: {ConnectionId}", Context.ConnectionId);
+                return;
+            }
+            
+            _logger.LogInformation("CreateReservation processing for tenant: {TenantId}", tenantId);
+
+            // Parse the date string to DateTime
+            if (!DateTime.TryParse(request.Date, out var dateTime))
+            {
+                _logger.LogWarning("Invalid date format in CreateReservation: {Date}", request.Date);
+                return;
+            }
+
+            // Use the provided ID as ConnectionId if available, otherwise generate one
+            var connectionId = !string.IsNullOrEmpty(request.Id) 
+                ? request.Id
+                : !string.IsNullOrEmpty(request.ConnectionId) 
+                    ? request.ConnectionId
+                    : $"{dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}-{request.DeviceId}";
+
+            // Create the full ReservationEntry with server-managed fields
+            var reservationEntry = new ReservationEntry
+            {
+                Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString(),
+                Name = request.Name,
+                DeviceId = request.DeviceId,
+                ConnectionId = connectionId,
+                Date = dateTime,
+                TenantId = tenantId,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = dateTime.AddMonths(1)
+            };
+
+            // Try to update first (in case this is an existing reservation)
+            var updatedReservation = await _mongoDbService.UpdateReservationAsync(reservationEntry);
+            bool isNewReservation = updatedReservation == null;
+
+            if (isNewReservation)
+            {
+                // Create new reservation
+                reservationEntry = await _mongoDbService.CreateReservationAsync(reservationEntry);
+            }
+            else
+            {
+                reservationEntry = updatedReservation;
+            }
+
+            // Broadcast to all clients in the same tenant group
+            if (reservationEntry != null)
+            {
+                var tenantGroupName = GetTenantGroupName(tenantId);
+                var signalRResponse = ReservationResponse.FromReservationEntry(reservationEntry);
+                
+                if (isNewReservation)
+                {
+                    await Clients.Group(tenantGroupName).ReservationAdded(signalRResponse);
+                    _logger.LogInformation("Reservation added via SignalR: {ConnectionId} for tenant: {TenantId}", connectionId, tenantId);
+                }
+                else
+                {
+                    await Clients.Group(tenantGroupName).ReservationUpdated(signalRResponse);
+                    _logger.LogInformation("Reservation updated via SignalR: {ConnectionId} for tenant: {TenantId}", connectionId, tenantId);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating reservation via SignalR");
+        }
+    }
+
+    // Hub method to delete a reservation
+    public async Task DeleteReservation(string reservationId)
+    {
+        try
+        {
+            _logger.LogInformation("DeleteReservation called by {ConnectionId} for reservation: {ReservationId}", Context.ConnectionId, reservationId);
+            
+            var tenantId = GetTenantIdFromQuery();
+            if (string.IsNullOrEmpty(tenantId))
+            {
+                _logger.LogWarning("DeleteReservation called without tenant context: {ConnectionId}", Context.ConnectionId);
+                return;
+            }
+            
+            _logger.LogInformation("DeleteReservation processing for tenant: {TenantId}", tenantId);
+
+            // Delete by ConnectionId (which is the reservationId parameter)
+            var removed = await _mongoDbService.DeleteReservationByConnectionIdAsync(tenantId, reservationId);
+            if (removed)
+            {
+                // Broadcast to all clients in the same tenant group
+                var tenantGroupName = GetTenantGroupName(tenantId);
+                await Clients.Group(tenantGroupName).ReservationDeleted(reservationId);
+                _logger.LogInformation("Reservation deleted via SignalR: {ConnectionId} for tenant: {TenantId}", reservationId, tenantId);
+            }
+            else
+            {
+                _logger.LogWarning("Reservation not found for deletion: {ConnectionId} for tenant: {TenantId}", reservationId, tenantId);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting reservation via SignalR: {ReservationId}", reservationId);
+        }
+    }
+
     // Helper method to get tenant group name for broadcasting
     public static string GetTenantGroupName(string tenantId) => $"tenant_{tenantId}";
 }
