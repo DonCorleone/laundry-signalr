@@ -14,6 +14,7 @@ builder.Services.AddCors(options =>
         {
             b.WithOrigins([
                     "http://localhost:4000", 
+                    "http://localhost:4200", 
                     "https://laundry-calendar.netlify.app", 
                     "https://laundry-reservation.onrender.com",
                     "https://server-mock--laundry-calendar.netlify.app/"
@@ -24,9 +25,34 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add controllers and other services
-builder.Services.AddControllers();
+// Add controllers and configure JSON serialization
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 builder.Services.AddHttpContextAccessor();
+
+// Add Swagger/OpenAPI services
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Laundry SignalR API",
+        Version = "v1",
+        Description = "Multi-tenant laundry reservation system with real-time SignalR notifications",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "Laundry Calendar",
+            Email = "vitocorleone77@gmail.com"
+        }
+    });
+    
+    // Configure Swagger to use the same JSON naming policy
+    c.DescribeAllParametersInCamelCase();
+});
 
 // Configure MongoDB
 var configuration = builder.Configuration;
@@ -66,6 +92,19 @@ builder.Services.AddHealthChecks()
     .AddCheck<MongoHealthCheck>("mongodb");
 
 var app = builder.Build();
+
+// Configure Swagger UI (only in development)
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Laundry SignalR API v1");
+        c.RoutePrefix = "swagger"; // Access at /swagger
+        c.DocumentTitle = "Laundry SignalR API Documentation";
+        c.DefaultModelsExpandDepth(-1); // Hide models by default for cleaner UI
+    });
+}
 
 // Configure middleware pipeline
 app.UseRouting();

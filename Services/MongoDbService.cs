@@ -288,4 +288,76 @@ public class MongoDbService : IMongoDbService
             return false;
         }
     }
+
+    #region ConnectionId-based methods for frontend API
+    
+    public async Task<ReservationEntry?> GetReservationByConnectionIdAsync(string tenantId, string connectionId)
+    {
+        try
+        {
+            var filter = Builders<ReservationEntry>.Filter.And(
+                Builders<ReservationEntry>.Filter.Eq(r => r.TenantId, tenantId),
+                Builders<ReservationEntry>.Filter.Eq(r => r.ConnectionId, connectionId)
+            );
+
+            var reservation = await _reservations.Find(filter).FirstOrDefaultAsync();
+            return reservation;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving reservation by ConnectionId: {ConnectionId} for tenant: {TenantId}", connectionId, tenantId);
+            return null;
+        }
+    }
+
+    public async Task<ReservationEntry?> UpdateReservationByConnectionIdAsync(string tenantId, string connectionId, ReservationEntry reservation)
+    {
+        try
+        {
+            var filter = Builders<ReservationEntry>.Filter.And(
+                Builders<ReservationEntry>.Filter.Eq(r => r.TenantId, tenantId),
+                Builders<ReservationEntry>.Filter.Eq(r => r.ConnectionId, connectionId)
+            );
+
+            // Ensure we don't change the ConnectionId or TenantId
+            reservation.ConnectionId = connectionId;
+            reservation.TenantId = tenantId;
+            reservation.UpdatedAt = DateTime.UtcNow;
+
+            var result = await _reservations.ReplaceOneAsync(filter, reservation);
+            
+            if (result.ModifiedCount > 0)
+            {
+                return reservation;
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating reservation by ConnectionId: {ConnectionId} for tenant: {TenantId}", connectionId, tenantId);
+            return null;
+        }
+    }
+
+    public async Task<bool> DeleteReservationByConnectionIdAsync(string tenantId, string connectionId)
+    {
+        try
+        {
+            var filter = Builders<ReservationEntry>.Filter.And(
+                Builders<ReservationEntry>.Filter.Eq(r => r.TenantId, tenantId),
+                Builders<ReservationEntry>.Filter.Eq(r => r.ConnectionId, connectionId)
+            );
+
+            var result = await _reservations.DeleteOneAsync(filter);
+            return result.DeletedCount > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting reservation by ConnectionId: {ConnectionId} for tenant: {TenantId}", connectionId, tenantId);
+            return false;
+        }
+    }
+    
+    #endregion
 }

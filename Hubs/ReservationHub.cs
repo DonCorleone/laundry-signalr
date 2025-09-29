@@ -40,9 +40,10 @@ public class ReservationHub : Hub<IReservationHubClients>
         {
             // Load tenant-specific data
             var reservationEntries = await _mongoDbService.GetAllReservationsAsync(tenantId);
+            var responseData = reservationEntries.Select(ReservationResponse.FromReservationEntry).ToList();
             
             // Send initial data to the connected client
-            await Clients.Caller.ReservationsLoaded(reservationEntries);
+            await Clients.Caller.ReservationsLoaded(responseData);
         }
         catch (Exception ex)
         {
@@ -82,7 +83,8 @@ public class ReservationHub : Hub<IReservationHubClients>
             
             // Send current reservations for this tenant
             var reservationEntries = await _mongoDbService.GetAllReservationsAsync(tenant.Id);
-            await Clients.Caller.ReservationsLoaded(reservationEntries);
+            var responseData = reservationEntries.Select(ReservationResponse.FromReservationEntry).ToList();
+            await Clients.Caller.ReservationsLoaded(responseData);
         }
         catch (Exception ex)
         {

@@ -22,6 +22,11 @@ public interface IMongoDbService
     Task<bool> DeleteReservationAsync(string tenantId, string reservationId);
     Task<int> CleanupExpiredReservationsAsync(string tenantId);
     
+    // ConnectionId-based methods for frontend API
+    Task<ReservationEntry?> GetReservationByConnectionIdAsync(string tenantId, string connectionId);
+    Task<ReservationEntry?> UpdateReservationByConnectionIdAsync(string tenantId, string connectionId, ReservationEntry reservation);
+    Task<bool> DeleteReservationByConnectionIdAsync(string tenantId, string connectionId);
+    
     // Health check
     Task<bool> IsHealthyAsync();
 }

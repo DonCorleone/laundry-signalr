@@ -14,10 +14,10 @@ public class ReservationEntry
     public string ConnectionId { get; set; } = string.Empty;
     public DateTime Date { get; set; }
     
-    // Multi-tenant support
+    // Multi-tenant support (auto-populated by server)
     public string TenantId { get; set; } = string.Empty;
     
-    // MongoDB metadata
+    // MongoDB metadata (auto-populated by server) 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     
