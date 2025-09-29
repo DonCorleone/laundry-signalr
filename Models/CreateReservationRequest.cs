@@ -34,4 +34,10 @@ public class CreateReservationRequest
     /// </summary>
     /// <example>2025-09-28T14:00:00-WM1</example>
     public string? ConnectionId { get; set; }
+    
+    /// <summary>
+    /// Optional ID to use as the reservation identifier (frontend tile ID)
+    /// </summary>
+    /// <example>2025-10-01T06:00:00.000Z-WM1</example>
+    public string? Id { get; set; }
 }

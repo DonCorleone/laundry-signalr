@@ -132,10 +132,13 @@ public class ReservationEntriesController : ControllerBase
                 return BadRequest("Invalid date format");
             }
 
-            // Generate ConnectionId if not provided (datetime-device format)
-            var connectionId = string.IsNullOrEmpty(request.ConnectionId) 
-                ? $"{dateTime:yyyy-MM-ddTHH:mm:ss.fffZ}-{request.DeviceId}"
-                : request.ConnectionId;
+            // Use the provided ID as ConnectionId if available, otherwise generate one
+            // This ensures frontend tile IDs match backend ConnectionIds
+            var connectionId = !string.IsNullOrEmpty(request.Id) 
+                ? request.Id
+                : !string.IsNullOrEmpty(request.ConnectionId) 
+                    ? request.ConnectionId
+                    : $"{dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}-{request.DeviceId}";
 
             // Create the full ReservationEntry with server-managed fields
             var reservationEntry = new ReservationEntry
@@ -249,7 +252,7 @@ public class ReservationEntriesController : ControllerBase
             else
             {
                 // Regenerate ConnectionId if date or device changed
-                existingReservation.ConnectionId = $"{dateTime:yyyy-MM-ddTHH:mm:ss.fffZ}-{request.DeviceId}";
+                existingReservation.ConnectionId = $"{dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}-{request.DeviceId}";
             }
 
             var updatedReservation = await _mongoDbService.UpdateReservationByConnectionIdAsync(tenantId, id, existingReservation);
