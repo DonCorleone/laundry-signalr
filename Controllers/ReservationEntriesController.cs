@@ -115,11 +115,8 @@ public class ReservationEntriesController : ControllerBase
     {
         try
         {
-            _logger.LogDebug("Received reservation request: {@Request}", request);
-            
             if (request == null)
             {
-                _logger.LogWarning("Request is null");
                 return BadRequest("Request body is required");
             }
 
@@ -139,8 +136,6 @@ public class ReservationEntriesController : ControllerBase
             var connectionId = string.IsNullOrEmpty(request.ConnectionId) 
                 ? $"{dateTime:yyyy-MM-ddTHH:mm:ss.fffZ}-{request.DeviceId}"
                 : request.ConnectionId;
-
-            _logger.LogDebug("Generated ConnectionId: {ConnectionId} for request: {@Request}", connectionId, request);
 
             // Create the full ReservationEntry with server-managed fields
             var reservationEntry = new ReservationEntry
