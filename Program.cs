@@ -6,19 +6,39 @@ using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add CORS
+// Add CORS with dynamic subdomain support
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularClient",
         b =>
         {
-            b.WithOrigins([
+            b.SetIsOriginAllowed(origin =>
+            {
+                if (string.IsNullOrEmpty(origin))
+                    return false;
+
+                var uri = new Uri(origin);
+                
+                // Allow specific known origins
+                var allowedOrigins = new[]
+                {
                     "https://laundry-reservation.onrender.com",
                     "https://slotwi.se"
-                ])
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
+                };
+                
+                if (allowedOrigins.Contains(origin))
+                    return true;
+                
+                // Allow any subdomain of slotwi.se
+                if (uri.Host.EndsWith(".slotwi.se", StringComparison.OrdinalIgnoreCase) && 
+                    uri.Scheme == "https")
+                    return true;
+                
+                return false;
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
         });
 });
 
