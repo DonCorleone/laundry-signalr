@@ -18,16 +18,24 @@ public class TenantResolverMiddleware
     {
         string? tenantCode = null;
 
-        // Try to get tenant from header first
+        // Try to get tenant from header first (this is the primary method for API calls)
         if (context.Request.Headers.TryGetValue("X-Tenant-Code", out var headerValue))
         {
             tenantCode = headerValue.FirstOrDefault();
+            if (!string.IsNullOrEmpty(tenantCode))
+            {
+                _logger.LogDebug("Tenant resolved from header: {TenantCode}", tenantCode);
+            }
         }
 
         // Fallback: try to get tenant from query parameter
         if (string.IsNullOrEmpty(tenantCode))
         {
             tenantCode = context.Request.Query["tenant"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(tenantCode))
+            {
+                _logger.LogDebug("Tenant resolved from query parameter: {TenantCode}", tenantCode);
+            }
         }
 
         // Fallback: try to get tenant from subdomain (e.g., tenant1.yourdomain.com)

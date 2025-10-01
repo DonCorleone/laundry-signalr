@@ -110,18 +110,21 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Configure Swagger UI (only in development)
-if (app.Environment.IsDevelopment())
+// Configure Swagger UI (enabled for all environments)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Laundry SignalR API v1");
+    c.RoutePrefix = "swagger"; // Access at /swagger
+    c.DocumentTitle = "Laundry SignalR API Documentation";
+    c.DefaultModelsExpandDepth(-1); // Hide models by default for cleaner UI
+    
+    // Add environment info to title
+    if (app.Environment.IsProduction())
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Laundry SignalR API v1");
-        c.RoutePrefix = "swagger"; // Access at /swagger
-        c.DocumentTitle = "Laundry SignalR API Documentation";
-        c.DefaultModelsExpandDepth(-1); // Hide models by default for cleaner UI
-    });
-}
+        c.DocumentTitle = "Laundry SignalR API Documentation - Production";
+    }
+});
 
 // Configure middleware pipeline
 app.UseRouting();
