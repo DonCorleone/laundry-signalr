@@ -18,35 +18,16 @@ public class TenantResolverMiddleware
     {
         string? tenantCode = null;
         
-        // Log all incoming headers for debugging
-        _logger.LogInformation("=== TENANT RESOLVER DEBUG ===");
-        _logger.LogInformation("Request Path: {Path}", context.Request.Path);
-        _logger.LogInformation("Request Host: {Host}", context.Request.Host);
-        _logger.LogInformation("All Headers: {Headers}", 
-            string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}={h.Value}")));
-
         // Try to get tenant from header first (this is the primary method for API calls)
         if (context.Request.Headers.TryGetValue("X-Tenant-Code", out var headerValue))
         {
             tenantCode = headerValue.FirstOrDefault();
-            if (!string.IsNullOrEmpty(tenantCode))
-            {
-                _logger.LogInformation("✅ Tenant resolved from header: {TenantCode}", tenantCode);
-            }
-        }
-        else
-        {
-            _logger.LogWarning("❌ X-Tenant-Code header not found in request");
         }
 
         // Fallback: try to get tenant from query parameter
         if (string.IsNullOrEmpty(tenantCode))
         {
             tenantCode = context.Request.Query["tenant"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(tenantCode))
-            {
-                _logger.LogDebug("Tenant resolved from query parameter: {TenantCode}", tenantCode);
-            }
         }
 
         // Fallback: try to get tenant from subdomain (e.g., tenant1.yourdomain.com)
@@ -66,18 +47,11 @@ public class TenantResolverMiddleware
             }
         }
 
-        // Default tenant for backward compatibility during migration
+        // Default tenant for backward compatibility
         if (string.IsNullOrEmpty(tenantCode))
         {
             tenantCode = "default";
-            _logger.LogInformation("🔄 Using default tenant (no tenant found)");
         }
-        
-        // Skip forcing default tenant for deployment domains - allow proper tenant resolution
-        // Note: Removed the automatic default tenant override for .onrender.com domains
-        // to allow proper multi-tenant functionality in production
-        
-        _logger.LogInformation("🎯 Final tenant code: {TenantCode}", tenantCode);
 
         try
         {
@@ -96,11 +70,9 @@ public class TenantResolverMiddleware
                         CreatedAt = DateTime.UtcNow,
                         IsActive = true
                     });
-                    _logger.LogInformation("Created default tenant for migration");
                 }
                 else
                 {
-                    _logger.LogWarning("Tenant not found: {TenantCode}", tenantCode);
                     context.Response.StatusCode = 404;
                     await context.Response.WriteAsync($"Tenant '{tenantCode}' not found");
                     return;
@@ -115,7 +87,7 @@ public class TenantResolverMiddleware
                 TenantName = tenant.Name
             });
 
-            _logger.LogDebug("Resolved tenant: {TenantCode} ({TenantId})", tenant.Code, tenant.Id);
+
         }
         catch (Exception ex)
         {
