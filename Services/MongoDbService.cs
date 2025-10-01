@@ -206,8 +206,8 @@ public class MongoDbService : IMongoDbService
         try
         {
             reservation.CreatedAt = DateTime.UtcNow;
-            // Set expiration based on the reservation date + some buffer time
-            reservation.ExpiresAt = reservation.Date.AddHours(1); // Expires 1 hour after reservation time
+            // Set expiration based on the reservation date + 2 months buffer time
+            reservation.ExpiresAt = reservation.Date.AddMonths(2); // Expires 2 months after reservation date
             
             await _reservations.InsertOneAsync(reservation);
             return reservation;
@@ -224,7 +224,7 @@ public class MongoDbService : IMongoDbService
         try
         {
             reservation.UpdatedAt = DateTime.UtcNow;
-            reservation.ExpiresAt = reservation.Date.AddHours(1);
+            reservation.ExpiresAt = reservation.Date.AddMonths(2);
             
             var filter = Builders<ReservationEntry>.Filter.And(
                 Builders<ReservationEntry>.Filter.Eq(r => r.Id, reservation.Id),

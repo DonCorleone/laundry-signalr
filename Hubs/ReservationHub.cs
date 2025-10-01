@@ -151,7 +151,7 @@ public class ReservationHub : Hub<IReservationHubClients>
                 Date = dateTime,
                 TenantId = tenantId,
                 CreatedAt = DateTime.UtcNow,
-                ExpiresAt = dateTime.AddMonths(1)
+                ExpiresAt = dateTime.AddMonths(2)
             };
 
             // Try to update first (in case this is an existing reservation)

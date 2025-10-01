@@ -124,7 +124,7 @@ public class TenantsController : ControllerBase
                     {
                         reservation.TenantId = tenant.Id;
                         reservation.CreatedAt = DateTime.UtcNow;
-                        reservation.ExpiresAt = reservation.Date.AddHours(1);
+                        reservation.ExpiresAt = reservation.Date.AddMonths(2);
                         await _mongoDbService.CreateReservationAsync(reservation);
                         migrationResults = migrationResults with { ReservationsMigrated = migrationResults.ReservationsMigrated + 1 };
                     }

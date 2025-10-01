@@ -150,7 +150,7 @@ public class ReservationEntriesController : ControllerBase
                 Date = dateTime,
                 TenantId = tenantId,
                 CreatedAt = DateTime.UtcNow,
-                ExpiresAt = dateTime.AddMonths(1) // Auto-expire 1 month after reservation date
+                ExpiresAt = dateTime.AddMonths(2) // Auto-expire 2 months after reservation date
             };
 
             // Try to update first (in case this is an existing reservation)
@@ -242,7 +242,7 @@ public class ReservationEntriesController : ControllerBase
             existingReservation.Name = request.Name;
             existingReservation.DeviceId = request.DeviceId;
             existingReservation.Date = dateTime;
-            existingReservation.ExpiresAt = dateTime.AddMonths(1);
+            existingReservation.ExpiresAt = dateTime.AddMonths(2);
             
             // Update ConnectionId if provided, or generate new one if device/date changed
             if (!string.IsNullOrEmpty(request.ConnectionId))

@@ -129,7 +129,7 @@ public class MigrationScript
                             TenantId = tenant.Id,
                             Date = reservationDate,
                             CreatedAt = DateTime.UtcNow,
-                            ExpiresAt = reservationDate.AddHours(1)
+                            ExpiresAt = reservationDate.AddMonths(2)
                         };
 
                         await _mongoDbService.CreateReservationAsync(reservationEntry);
