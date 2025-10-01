@@ -31,11 +31,17 @@ public class TenantResolverMiddleware
         }
 
         // Fallback: try to get tenant from subdomain (e.g., tenant1.yourdomain.com)
+        // Skip subdomain extraction for Render and localhost
         if (string.IsNullOrEmpty(tenantCode))
         {
             var host = context.Request.Host.Host;
             var parts = host.Split('.');
-            if (parts.Length > 2) // Assuming subdomain.domain.com format
+            
+            // Skip subdomain extraction for Render domains and localhost
+            bool isRenderDomain = host.EndsWith(".onrender.com", StringComparison.OrdinalIgnoreCase);
+            bool isLocalhost = host.StartsWith("localhost", StringComparison.OrdinalIgnoreCase);
+            
+            if (parts.Length > 2 && !isRenderDomain && !isLocalhost)
             {
                 tenantCode = parts[0];
             }
@@ -43,6 +49,13 @@ public class TenantResolverMiddleware
 
         // Default tenant for backward compatibility during migration
         if (string.IsNullOrEmpty(tenantCode))
+        {
+            tenantCode = "default";
+        }
+        
+        // Force default tenant for deployment domains
+        var currentHost = context.Request.Host.Host;
+        if (currentHost.EndsWith(".onrender.com", StringComparison.OrdinalIgnoreCase))
         {
             tenantCode = "default";
         }
