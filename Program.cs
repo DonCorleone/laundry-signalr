@@ -51,25 +51,28 @@ builder.Services.AddControllers()
     });
 builder.Services.AddHttpContextAccessor();
 
-// Add Swagger/OpenAPI services
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+// Add Swagger/OpenAPI services (only in development for security)
+if (builder.Environment.IsDevelopment())
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
     {
-        Title = "Laundry SignalR API",
-        Version = "v1",
-        Description = "Multi-tenant laundry reservation system with real-time SignalR notifications",
-        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
         {
-            Name = "Laundry Calendar",
-            Email = "vitocorleone77@gmail.com"
-        }
+            Title = "Laundry SignalR API",
+            Version = "v1",
+            Description = "Multi-tenant laundry reservation system with real-time SignalR notifications",
+            Contact = new Microsoft.OpenApi.Models.OpenApiContact
+            {
+                Name = "Laundry Calendar",
+                Email = "vitocorleone77@gmail.com"
+            }
+        });
+        
+        // Configure Swagger to use the same JSON naming policy
+        c.DescribeAllParametersInCamelCase();
     });
-    
-    // Configure Swagger to use the same JSON naming policy
-    c.DescribeAllParametersInCamelCase();
-});
+}
 
 // Configure MongoDB
 var configuration = builder.Configuration;
@@ -110,21 +113,18 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Configure Swagger UI (enabled for all environments)
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+// Configure Swagger UI (only in development for security)
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Laundry SignalR API v1");
-    c.RoutePrefix = "swagger"; // Access at /swagger
-    c.DocumentTitle = "Laundry SignalR API Documentation";
-    c.DefaultModelsExpandDepth(-1); // Hide models by default for cleaner UI
-    
-    // Add environment info to title
-    if (app.Environment.IsProduction())
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
     {
-        c.DocumentTitle = "Laundry SignalR API Documentation - Production";
-    }
-});
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Laundry SignalR API v1");
+        c.RoutePrefix = "swagger"; // Access at /swagger
+        c.DocumentTitle = "Laundry SignalR API Documentation - Development";
+        c.DefaultModelsExpandDepth(-1); // Hide models by default for cleaner UI
+    });
+}
 
 // Configure middleware pipeline
 app.UseRouting();
