@@ -17,6 +17,13 @@ public class TenantResolverMiddleware
     public async Task InvokeAsync(HttpContext context, ITenantContextService tenantContext, IMongoDbService mongoDbService)
     {
         string? tenantCode = null;
+        
+        // Log all incoming headers for debugging
+        _logger.LogInformation("=== TENANT RESOLVER DEBUG ===");
+        _logger.LogInformation("Request Path: {Path}", context.Request.Path);
+        _logger.LogInformation("Request Host: {Host}", context.Request.Host);
+        _logger.LogInformation("All Headers: {Headers}", 
+            string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}={h.Value}")));
 
         // Try to get tenant from header first (this is the primary method for API calls)
         if (context.Request.Headers.TryGetValue("X-Tenant-Code", out var headerValue))
@@ -24,8 +31,12 @@ public class TenantResolverMiddleware
             tenantCode = headerValue.FirstOrDefault();
             if (!string.IsNullOrEmpty(tenantCode))
             {
-                _logger.LogDebug("Tenant resolved from header: {TenantCode}", tenantCode);
+                _logger.LogInformation("✅ Tenant resolved from header: {TenantCode}", tenantCode);
             }
+        }
+        else
+        {
+            _logger.LogWarning("❌ X-Tenant-Code header not found in request");
         }
 
         // Fallback: try to get tenant from query parameter
@@ -59,14 +70,14 @@ public class TenantResolverMiddleware
         if (string.IsNullOrEmpty(tenantCode))
         {
             tenantCode = "default";
+            _logger.LogInformation("🔄 Using default tenant (no tenant found)");
         }
         
-        // Force default tenant for deployment domains
-        var currentHost = context.Request.Host.Host;
-        if (currentHost.EndsWith(".onrender.com", StringComparison.OrdinalIgnoreCase))
-        {
-            tenantCode = "default";
-        }
+        // Skip forcing default tenant for deployment domains - allow proper tenant resolution
+        // Note: Removed the automatic default tenant override for .onrender.com domains
+        // to allow proper multi-tenant functionality in production
+        
+        _logger.LogInformation("🎯 Final tenant code: {TenantCode}", tenantCode);
 
         try
         {
