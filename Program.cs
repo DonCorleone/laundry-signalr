@@ -14,6 +14,7 @@ builder.Services.AddCors(options =>
         {
             b.WithOrigins([
                     "https://laundry-reservation.onrender.com",
+                    "https://slotwi.se"
                 ])
                 .AllowAnyHeader()
                 .AllowAnyMethod()
