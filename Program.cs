@@ -76,12 +76,11 @@ if (builder.Environment.IsDevelopment())
 
 // Configure MongoDB
 var configuration = builder.Configuration;
-var mongoConnectionString = configuration.GetConnectionString("MongoDB") 
-    ?? configuration["MongoDB:ConnectionString"] 
-    ?? Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING");
+var mongoConnectionString = Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING")
+    ?? configuration.GetConnectionString("MongoDB")
+    ?? configuration["MongoDB:ConnectionString"];
 
-var mongoDatabaseName = configuration["MongoDB:DatabaseName"] 
-    ?? Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME") 
+var mongoDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DATABASE_NAME")
     ?? "laundry-calendar";
 
 if (string.IsNullOrEmpty(mongoConnectionString))
