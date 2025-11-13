@@ -25,15 +25,15 @@ builder.Services.AddCors(options =>
                     "https://laundry-reservation.onrender.com",
                     "https://slotwi.se"
                 };
-                
+
                 if (allowedOrigins.Contains(origin))
                     return true;
-                
+
                 // Allow any subdomain of slotwi.se
-                if (uri.Host.EndsWith(".slotwi.se", StringComparison.OrdinalIgnoreCase) && 
+                if (uri.Host.EndsWith(".slotwi.se", StringComparison.OrdinalIgnoreCase) &&
                     uri.Scheme == "https")
                     return true;
-                
+
                 return false;
             })
             .AllowAnyHeader()
@@ -126,15 +126,15 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure middleware pipeline
+app.UseCors("AllowAngularClient"); // CORS must come before UseRouting for SignalR
 app.UseRouting();
-app.UseCors("AllowAngularClient");
 
 // Add tenant resolver middleware
 app.UseMiddleware<TenantResolverMiddleware>();
 
 // Map endpoints
 app.MapControllers();
-app.MapHub<ReservationHub>("/hub");
+app.MapHub<ReservationHub>("/hub").RequireCors("AllowAngularClient");
 app.MapHealthChecks("/health");
 
 // Explicitly set the port to 5263
