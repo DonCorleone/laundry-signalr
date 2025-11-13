@@ -88,7 +88,25 @@ if (string.IsNullOrEmpty(mongoConnectionString))
     throw new InvalidOperationException("MongoDB connection string is not configured. Please set it in appsettings.json or environment variables.");
 }
 
-builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
+// Configure MongoDB client with explicit TLS settings for production environments
+var mongoClientSettings = MongoClientSettings.FromConnectionString(mongoConnectionString);
+mongoClientSettings.ServerSelectionTimeout = TimeSpan.FromSeconds(10);
+mongoClientSettings.ConnectTimeout = TimeSpan.FromSeconds(10);
+
+// Explicit SSL/TLS configuration for Render.com and other cloud platforms
+if (mongoConnectionString.Contains("mongodb+srv://") || mongoConnectionString.Contains("ssl=true"))
+{
+    mongoClientSettings.UseTls = true;
+    mongoClientSettings.AllowInsecureTls = false;
+    
+    // Use system default TLS settings (compatible with .NET 9.0 and MongoDB Atlas)
+    mongoClientSettings.SslSettings = new MongoDB.Driver.SslSettings
+    {
+        EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13
+    };
+}
+
+builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoClientSettings));
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var client = sp.GetRequiredService<IMongoClient>();

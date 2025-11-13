@@ -20,45 +20,49 @@ public class MongoDbService : IMongoDbService
         _subjects = _database.GetCollection<Subject>("subjects");
         _reservations = _database.GetCollection<ReservationEntry>("reservations");
         
-        // Create indexes for better performance
-        CreateIndexes();
+        // Create indexes in background (non-blocking)
+        _ = Task.Run(async () => await CreateIndexesAsync());
     }
 
-    private void CreateIndexes()
+    private async Task CreateIndexesAsync()
     {
         try
         {
+            _logger.LogInformation("Creating MongoDB indexes...");
+            
             // Tenant indexes
-            _tenants.Indexes.CreateOne(new CreateIndexModel<Tenant>(
+            await _tenants.Indexes.CreateOneAsync(new CreateIndexModel<Tenant>(
                 Builders<Tenant>.IndexKeys.Ascending(t => t.Code),
                 new CreateIndexOptions { Unique = true }));
 
             // Subject indexes
-            _subjects.Indexes.CreateOne(new CreateIndexModel<Subject>(
+            await _subjects.Indexes.CreateOneAsync(new CreateIndexModel<Subject>(
                 Builders<Subject>.IndexKeys.Ascending(s => s.TenantId)));
             
-            _subjects.Indexes.CreateOne(new CreateIndexModel<Subject>(
+            await _subjects.Indexes.CreateOneAsync(new CreateIndexModel<Subject>(
                 Builders<Subject>.IndexKeys.Combine(
                     Builders<Subject>.IndexKeys.Ascending(s => s.TenantId),
                     Builders<Subject>.IndexKeys.Ascending(s => s.Key))));
 
             // Reservation indexes
-            _reservations.Indexes.CreateOne(new CreateIndexModel<ReservationEntry>(
+            await _reservations.Indexes.CreateOneAsync(new CreateIndexModel<ReservationEntry>(
                 Builders<ReservationEntry>.IndexKeys.Ascending(r => r.TenantId)));
                 
-            _reservations.Indexes.CreateOne(new CreateIndexModel<ReservationEntry>(
+            await _reservations.Indexes.CreateOneAsync(new CreateIndexModel<ReservationEntry>(
                 Builders<ReservationEntry>.IndexKeys.Combine(
                     Builders<ReservationEntry>.IndexKeys.Ascending(r => r.TenantId),
                     Builders<ReservationEntry>.IndexKeys.Ascending(r => r.DeviceId))));
 
             // TTL index for automatic expiration
-            _reservations.Indexes.CreateOne(new CreateIndexModel<ReservationEntry>(
+            await _reservations.Indexes.CreateOneAsync(new CreateIndexModel<ReservationEntry>(
                 Builders<ReservationEntry>.IndexKeys.Ascending(r => r.ExpiresAt),
                 new CreateIndexOptions { ExpireAfter = TimeSpan.Zero }));
+            
+            _logger.LogInformation("MongoDB indexes created successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating MongoDB indexes");
+            _logger.LogWarning(ex, "Error creating MongoDB indexes - will retry on next restart");
         }
     }
 
