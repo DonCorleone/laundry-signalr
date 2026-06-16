@@ -7,6 +7,10 @@ using MongoDB.Driver;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add CORS with dynamic subdomain support
+var corsBaseOrigins = new[] { "https://laundry-reservation.onrender.com", "https://slotwi.se", "https://reserva.re" };
+var corsAdditionalOrigins = builder.Configuration.GetSection("Cors:AdditionalOrigins").Get<string[]>() ?? [];
+var corsAllowedOrigins = corsBaseOrigins.Concat(corsAdditionalOrigins).ToHashSet();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularClient",
@@ -18,15 +22,8 @@ builder.Services.AddCors(options =>
                     return false;
 
                 var uri = new Uri(origin);
-                
-                // Allow specific known origins
-                var allowedOrigins = new[]
-                {
-                    "https://laundry-reservation.onrender.com",
-                    "https://slotwi.se"
-                };
 
-                if (allowedOrigins.Contains(origin))
+                if (corsAllowedOrigins.Contains(origin))
                     return true;
 
                 // Allow any subdomain of slotwi.se
@@ -126,8 +123,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // Configure middleware pipeline
-app.UseCors("AllowAngularClient"); // CORS must come before UseRouting for SignalR
 app.UseRouting();
+app.UseCors("AllowAngularClient");
 
 // Add tenant resolver middleware
 app.UseMiddleware<TenantResolverMiddleware>();
