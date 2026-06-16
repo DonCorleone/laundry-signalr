@@ -3,3 +3,32 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+
+# Configuration files with secrets
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# User Secrets (just in case)
+secrets.json
+Controllers/MigrationController.cs
+redis-export/all_reservations.json
+redis-export/convert_redis_data.py
+redis-export/DR1_raw.txt
+redis-export/DR1_reservations.json
+redis-export/expirations_raw.txt
+redis-export/test_reservations.json
+redis-export/WM1_raw.txt
+redis-export/WM1_reservations.json
+redis-export/WM2_raw.txt
+redis-export/WM2_reservations.json
+export-redis-data.sh
+test_migration.json
+/app.log

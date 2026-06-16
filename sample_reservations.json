@@ -1,0 +1,30 @@
+{
+  "WM1": [
+    {
+      "id": "WM1:2024-01-15T10:00:00Z",
+      "name": "John Doe", 
+      "userCode": "JD01",
+      "email": "john@example.com",
+      "date": "2024-01-15T10:00:00Z",
+      "createdAt": "2024-01-14T15:30:00Z"
+    },
+    {
+      "id": "WM1:2024-01-15T14:00:00Z",
+      "name": "Jane Smith",
+      "userCode": "JS02", 
+      "email": "jane@example.com",
+      "date": "2024-01-15T14:00:00Z",
+      "createdAt": "2024-01-14T18:45:00Z"
+    }
+  ],
+  "DR1": [
+    {
+      "id": "DR1:2024-01-16T09:00:00Z",
+      "name": "Bob Wilson",
+      "userCode": "BW03",
+      "email": "bob@example.com", 
+      "date": "2024-01-16T09:00:00Z",
+      "createdAt": "2024-01-15T20:15:00Z"
+    }
+  ]
+}
